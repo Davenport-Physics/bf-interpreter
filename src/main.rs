@@ -64,24 +64,32 @@ impl Interpreter {
 
             match chars[i] {
                 '>' => {
-                    
                     self.pointer += 1;
                     if self.pointer == 30000 {
                         panic!("Pointer exceeded memory bounds.");
                     }
-
                 },
                 '<' => {
-
                     if let Some(val) = self.pointer.checked_sub(1) {
                         self.pointer = val;
                     } else {
                         panic!("Pointer overflowed on subtraction.");
                     }
-
                 },
-                '+' => self.memory[self.pointer] += 1,
-                '-' => self.memory[self.pointer] -= 1,
+                '+' => {
+                    if let Some(val) = self.memory[self.pointer].checked_add(1) {
+                        self.memory[self.pointer] = val;
+                    } else {
+                        panic!("Memory overflowed on addition.");
+                    }
+                },
+                '-' => {
+                    if let Some(val) = self.memory[self.pointer].checked_sub(1) {
+                        self.memory[self.pointer] = val;
+                    } else {
+                        panic!("Memory overflowed on subtraction.");
+                    }
+                },
                 '.' => print!("{}", self.memory[self.pointer] as char),
                 ',' => self.memory[self.pointer] = std::io::stdin().read(&mut input_buffer).unwrap() as u8,
                 '[' => {
